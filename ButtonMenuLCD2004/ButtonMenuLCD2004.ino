@@ -83,5 +83,8 @@ void loop() {
     prevButtonState4 = buttonState4;
   }
 
+void menu1() { 
 
+}
+  
 }
