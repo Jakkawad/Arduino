@@ -72,15 +72,16 @@ void loop() {
     if(currentMenu == 1) {
       setDate();
     } else if(currentMenu == 3) {
+      //
       if(numberClick == 0) {
-        numberClick = 1;
+//        numberClick + 1;
         selectItem(17,1);
       } else if(numberClick == 1) {
-        numberClick = 2;
+//        numberClick + 1;
         selectItem(17,2);
         unSelectItem(17,1);
       } else if(numberClick == 2) {
-        numberClick = 3;
+//        numberClick + 1;
         selectItem(17,3);
         unSelectItem(17,2);
       } else {
@@ -95,15 +96,16 @@ void loop() {
     if(currentMenu == 1) {
       setTimePerDay();
     } else if(currentMenu == 3) {
+      //
       if(numberClick == 0) {
-        numberClick = 1;
+//        numberClick - 1;
         selectItem(17,1);
       } else if(numberClick == 1) {
-        numberClick = -1;
+//        numberClick = -1;
         selectItem(17,2);
         unSelectItem(17,1);
       } else if(numberClick == 2) {
-        numberClick = -1;
+//        numberClick - 1;
         selectItem(17,3);
         unSelectItem(17,2);
       } else {
