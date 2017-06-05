@@ -1,7 +1,12 @@
 #include <LiquidCrystal_I2C.h>
 #include <Wire.h> 
-
+#include "RTClib.h"
 LiquidCrystal_I2C lcd(0x27,20,4);
+
+RTC_DS3231 rtc;
+
+char daysOfTheWeek[7][12] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+
 
 const int buttonPin1 = 2;
 const int buttonPin2 = 3;
@@ -20,6 +25,7 @@ int currentMenu = 0;
 int subMenu = 0;
 int isSelected = 0;
 int numberClick = 0;
+int settingMenu = 0;
 
 //selectedOption
 int timePerDay = 0;
@@ -46,7 +52,18 @@ void setup() {
   lcd.init();
   lcd.backlight();
   lcd.setCursor(0,0);
-  lcd.print("Loading....");
+//  lcd.print("Loading....");
+
+  rtc.begin();
+  if (rtc.lostPower()) {
+    Serial.println("RTC lost power, lets set the time!");
+    // following line sets the RTC to the date & time this sketch was compiled
+//    rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+//    rtc.adjust(DateTime(__DATE__, __TIME__));
+    // This line sets the RTC with an explicit date & time, for example to set
+    // January 21, 2014 at 3am you would call:
+    // rtc.adjust(DateTime(2014, 1, 21, 3, 0, 0));
+  }
 }
 
 void loop() {
@@ -62,11 +79,14 @@ void loop() {
   if(buttonState1 == LOW && prevButtonState1 == HIGH) {
     Serial.println("Button 1");
     if(currentMenu == 0) {
-//      lcd.clear();
       intoMenu();
       currentMenu = 1;
     } else if(currentMenu == 1) {
-      Serial.println("Exit to mainmenu");
+      Serial.println("Exit to MainMenu 1");
+    } else if(currentMenu == 2) {
+      Serial.println("Exit to MainMenu 2");
+    } else if(currentMenu == 3) {
+      Serial.println("Exit to MainMenu 3");
     }
     prevButtonState1 = buttonState1;
   } else if(buttonState2 == LOW && prevButtonState2 == HIGH) {
@@ -100,14 +120,17 @@ void loop() {
         numberClick += 1;
         selectItem(19,1);
         unSelectItem(19,3);
+        timePerDay = 1;
       } else if(numberClick == 1) {
         numberClick += 1;
         selectItem(19,2);
         unSelectItem(19,1);
+        timePerDay = 2;
       } else if(numberClick == 2) {
         numberClick += 1;
         selectItem(19,3);
         unSelectItem(19,2);
+        timePerDay = 3;
       } else {
         numberClick = 0;
       }
@@ -193,11 +216,21 @@ void loop() {
       }
     } else if(currentMenu == 2) {
       Serial.println("CurrentMenu 2 Button 3");
+      if(timePerDay != 0) {
+        Serial.println("Time Per Day");
+        Serial.println(timePerDay);
+        currentMenu = 5;
+//        intoMenu();
+        if(timePerDay == 1) {
+          setDatePerTime1();
+        }
+      }
     } else if(currentMenu == 3) {
       if(weightPerDay != 0) {
         Serial.println("CurrentMenu 3 Button 3");
         Serial.println("Weight Per Day");
         Serial.println(weightPerDay);
+//        settingMenu = 1;
         currentMenu = 1;
         intoMenu();
       }
@@ -211,8 +244,10 @@ void loop() {
     Serial.println("Button 4");
     if(currentMenu == 1) {
       Serial.println("Cancle");
+      numberClick = 0;
       intoMenu();
       currentMenu = 1;
+      settingMenu = 1;
     } else if(currentMenu == 2) {
       Serial.println("CurrentMenu 2 Button 4");
       intoMenu();
@@ -230,9 +265,21 @@ void loop() {
     prevButtonState2 = buttonState2;
     prevButtonState3 = buttonState3;
     prevButtonState4 = buttonState4;
-    
+
+//    if(settingMenu == 1) {
+//      lcd.clear();
+//      statusMenu();
+//      delay(1000);
+//    }
+//    Serial.println("Status Menu"); 
 //    statusMenu();
+//    delay(300);
   }
+}
+void clearRowLCD(int r, int c) {
+  lcd.setCursor(r,c);
+  lcd.print("                    ");
+  Serial.println("ClearRowLCD");
 }
 void statusMenu() {
 //  lcd.clear();
@@ -242,7 +289,18 @@ void statusMenu() {
   lcd.print("12:12");
   lcd.setCursor(0,3);
   lcd.print("Menu");
-  delay(50);
+//  lcd.clear();
+  //
+  if(weightPerDay != 0) {
+    lcd.setCursor(0,1);
+    lcd.print("Weight =");
+  }
+  if(timePerDay != 0) {
+    lcd.setCursor(0,2);
+    lcd.print("Time Per Day");
+  }
+  
+//  delay(50);
 }
 void intoMenu() {
   lcd.clear();
@@ -259,6 +317,23 @@ void menuSetDate() {
   lcd.clear();
   lcd.setCursor(0,0);
   lcd.print("set Date");
+  DateTime now = rtc.now();
+  lcd.setCursor(4,1);
+  lcd.print(now.year(), DEC);
+  Serial.print(now.year(), DEC);
+  Serial.print('/');
+  Serial.print(now.month(), DEC);
+  Serial.print('/');
+  Serial.print(now.day(), DEC);
+  Serial.print(" (");
+  Serial.print(daysOfTheWeek[now.dayOfTheWeek()]);
+  Serial.print(") ");
+  Serial.print(now.hour(), DEC);
+  Serial.print(':');
+  Serial.print(now.minute(), DEC);
+  Serial.print(':');
+  Serial.print(now.second(), DEC);
+  Serial.println();
 }
 void menuTimePerDay() {
   lcd.clear();
