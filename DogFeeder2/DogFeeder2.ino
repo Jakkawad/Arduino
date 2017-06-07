@@ -4,10 +4,10 @@
 LiquidCrystal_I2C lcd(0x27,20,4);
 RTC_DS3231 rtc;
 //button
-const int buttonPin1 = 2;
-const int buttonPin2 = 3;
-const int buttonPin3 = 4;
-const int buttonPin4 = 5;
+const int buttonPin1 = 52;
+const int buttonPin2 = 50;
+const int buttonPin3 = 48;
+const int buttonPin4 = 46;
 int buttonState1 = 0;
 int buttonState2 = 0;
 int buttonState3 = 0;
@@ -59,7 +59,7 @@ void setup() {
   }
   if(rtc.lostPower()) {
     Serial.println("RTC lost power, lets set the time!");
-    rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+//    rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
   }
 }
 
