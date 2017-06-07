@@ -1,4 +1,4 @@
-int redLed = 6;
+int redLed = 53;
 
 void setup() {
   // put your setup code here, to run once:

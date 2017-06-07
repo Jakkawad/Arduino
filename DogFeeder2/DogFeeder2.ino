@@ -1,9 +1,9 @@
-
 #include <LiquidCrystal_I2C.h>
 #include <Wire.h> 
 #include "RTClib.h"
 LiquidCrystal_I2C lcd(0x27,20,4);
 RTC_DS3231 rtc;
+//button
 const int buttonPin1 = 2;
 const int buttonPin2 = 3;
 const int buttonPin3 = 4;
@@ -17,28 +17,25 @@ int prevButtonState2;
 int prevButtonState3;
 int prevButtonState4;
 //menu
-int lcd_key = 0;
+int buttonKey = 0;
 int currentMenu = 1;
 int numberClick = 0;
 int isSelected = 0;
-int timerSelected = 0;
-int isHM = 0;
+int applySetTime = 0;
 int isTimer = 0;
-int isAlarm = 0;
-//to do
-int isFeeding = 0;
-//selectedOption
-int timerFeed = 0;
-int timePerDay = 0;
+int isHM = 0;
+// value status
 int weightPerDay = 0;
-//==== Time ====//
+int timePerDay = 0;
+int timerSelected = 0;
+//time value
 int hours1 = 0;
 int minutes1 = 0;
 int hours2 = 0;
 int minutes2 = 0;
 int hours3 = 0;
 int minutes3 = 0;
-int applySetTime = 0;
+//time now
 int nowDay = 0;
 int nowMonth = 0;
 int nowYear = 0;
@@ -51,76 +48,43 @@ int nowSecond = 0;
 #define button3  3
 #define button4  4
 #define btnNone 0
-int ledPin = 12;
-int read_LCD_buttons()
-{
-  buttonState1 = digitalRead(buttonPin1);
-  buttonState2 = digitalRead(buttonPin2);
-  buttonState3 = digitalRead(buttonPin3);
-  buttonState4 = digitalRead(buttonPin4);
-  if(buttonState1 == LOW && prevButtonState1 == HIGH) {
-    prevButtonState1 = buttonState1;
-    return button1;
-  } else if(buttonState2 == LOW && prevButtonState2 == HIGH) {
-    prevButtonState2 = buttonState2;
-    return button2;
-  } else if(buttonState3 == LOW && prevButtonState3 == HIGH) {
-    prevButtonState3 = buttonState3;
-    return button3;
-  } else if(buttonState4 == LOW && prevButtonState4 == HIGH) {
-    prevButtonState4 = buttonState4;
-    return button4;
-  } else {
-    prevButtonState1 = buttonState1;
-    prevButtonState2 = buttonState2;
-    prevButtonState3 = buttonState3;
-    prevButtonState4 = buttonState4;
-    return btnNone;
-  }
-}
 void setup() {
+  // put your setup code here, to run once:
   Serial.begin(9600);
   lcd.init();
   lcd.backlight();
-  pinMode(ledPin, OUTPUT);
-//  Serial.println("Setup");
-  if (! rtc.begin()) {
+  if(! rtc.begin()) {
     Serial.println("Couldn't find RTC");
     while (1);
   }
-  if (rtc.lostPower()) {
+  if(rtc.lostPower()) {
     Serial.println("RTC lost power, lets set the time!");
-//    rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+    rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
   }
 }
-void loop() {  
-  lcd_key = read_LCD_buttons();
-  switch (lcd_key) {
-   case button1:
-     {
-     Serial.println("button1");
-     if(currentMenu == 0) {
-      Serial.println("Button = 1, CurrentMenu = 0");
-     } else if(currentMenu == 1) {
-      Serial.println("Button = 1, CurrentMenu = 1");
-      mainMenu();
-      currentMenu = 2;
-     } else if(currentMenu == 2) {
-      Serial.println("Button = 1, CurrentMenu = 2");
-      lcd.clear();
-      statusMenu();
-      currentMenu = 1;
-     } else if(currentMenu == 3) {
-      Serial.println("Button = 1, CurrentMenu = 3");
-     } else if(currentMenu == 4) {
-      Serial.println("Button = 1, CurrentMenu = 4");
-      mainMenu();
-      currentMenu = 2;
-//      numberClick = 0;
-      clearValueToMenu(1);
-     } else if(currentMenu == 5) {
-      Serial.println("Button = 1, CurrentMenu = 5");
-      if(timerSelected == 1) {
+
+void loop() {
+  // put your main code here, to run repeatedly:
+  buttonKey = read_LCD_Button();
+  switch (buttonKey) {
+    case button1: {
+      Serial.println("button1");
+      if(currentMenu == 1) {
+        Serial.println("Button = 1, CurrentMenu = 1");
+        mainMenu();
+        currentMenu = 2;
+      } else if(currentMenu == 2) {
+        Serial.println("Button = 1, CurrentMenu = 2");
+        lcd.clear();
+        statusMenu();
+        currentMenu = 1;
+      } else if(currentMenu == 3) {
+        Serial.println("Button = 1, CurrentMenu = 3");
+      } else if(currentMenu == 4) {
+        Serial.println("Button = 1, CurrentMenu = 4");
+      } else if(currentMenu == 5) {
+        Serial.println("Button = 1, CurrentMenu = 5");
+        if(timerSelected == 1) {
         Serial.println("Timer 1");
         if(numberClick == 0) {
           setHourMinute(1,1);
@@ -208,28 +172,22 @@ void loop() {
           lcd.print(" ");
         }
       }
-     } else if(currentMenu == 6) {
-      Serial.println("Button = 1, CurrentMenu = 6");
-     } else if(currentMenu == 7) {
-      Serial.println("Button = 1, CurrentMenu = 7");
-     } else if(currentMenu == 8) {
-      mainMenu();
-      currentMenu = 2;
-//      numberClick = 0;
-      clearValueToMenu(1);
-     }
-     break;
-     }
-   case button2:
-     {
-     if(currentMenu == 0) {
-      Serial.println("Button = 2, CurrentMenu = 0");
-     } else if(currentMenu == 1) {
-      Serial.println("Button = 2, CurrentMenu = 1");
-      
-     } else if(currentMenu == 2) {
-      Serial.println("Button = 2, CurrentMenu = 2");
-      if(numberClick == 0) {
+      } else if(currentMenu == 6) {
+        Serial.println("Button = 1, CurrentMenu = 6");
+      } else if(currentMenu == 7) {
+        Serial.println("Button = 1, CurrentMenu = 7");
+      } else if(currentMenu == 8) {
+        Serial.println("Button = 1, CurrentMenu = 8");
+      }
+      break;
+    }
+    case button2: {
+      Serial.println("button1");
+      if(currentMenu == 1) {
+        Serial.println("Button = 2, CurrentMenu = 1");
+      } else if(currentMenu == 2) {
+        Serial.println("Button = 2, CurrentMenu = 2");
+        if(numberClick == 0) {
         numberClick += 1;
         selectItem(19,1);
         unSelectItem(19,3);
@@ -251,11 +209,11 @@ void loop() {
 //        numberClick = 0; 
         clearValueToMenu(1);
       }
-     } else if(currentMenu == 3) {
-      Serial.println("Button = 2, CurrentMenu = 3");
-     } else if(currentMenu == 4) {
-      Serial.println("Button = 2, CurrentMenu = 4");
-      if(numberClick == 0) {
+      } else if(currentMenu == 3) {
+        Serial.println("Button = 2, CurrentMenu = 3");
+      } else if(currentMenu == 4) {
+        Serial.println("Button = 2, CurrentMenu = 4");
+        if(numberClick == 0) {
         numberClick += 1;
         selectItem(19,1);
         unSelectItem(19,3);
@@ -277,13 +235,10 @@ void loop() {
 //        numberClick = 0;
         clearValueToMenu(1);
       }
-     } else if(currentMenu == 5) {
-      Serial.println("Button = 2, CurrentMenu = 5");
-      if(isHM == 0) {
-//        Serial.println("HM = 0");
-      } else {
-//        Serial.println("HM != 0");
-        if(isTimer == 1) {
+      } else if(currentMenu == 5) {
+        Serial.println("Button = 2, CurrentMenu = 5");
+        if(isHM != 0) {
+          if(isTimer == 1) {
           Serial.println("isTimer == 1");
           if(isHM == 1) {
             menuSetTime1();
@@ -350,14 +305,14 @@ void loop() {
             }
           }
         }
-      }
-     } else if(currentMenu == 6) {
-      Serial.println("Button = 2, CurrentMenu = 6");
-     } else if(currentMenu == 7) {
-      Serial.println("Button = 2, CurrentMenu = 7");
-     } else if(currentMenu == 8) {
-      Serial.println("Button = 2, CurrentMenu = 8");
-      if(numberClick == 0) {
+        }
+      } else if(currentMenu == 6) {
+        Serial.println("Button = 2, CurrentMenu = 6");
+      } else if(currentMenu == 7) {
+        Serial.println("Button = 2, CurrentMenu = 7");
+      } else if(currentMenu == 8) {
+        Serial.println("Button = 2, CurrentMenu = 8");
+        if(numberClick == 0) {
         numberClick += 1;
         selectItem(8,1);
         unSelectItem(19,3);
@@ -391,22 +346,16 @@ void loop() {
 //        numberClick = 0;
         clearValueToMenu(1);
       }
-     }
-     break;
-     }
-   case button3:
-     {
-     if(currentMenu == 0) {
-      mainMenu();
-      currentMenu = 1;
-//      numberClick = 0;
-      clearValueToMenu(1);
-      Serial.println("Button = 3, CurrentMenu = 0");
-     } else if(currentMenu == 1) {
-      Serial.println("Button = 3, CurrentMenu = 1");
-     } else if(currentMenu == 2) {
-      Serial.println("Button = 3, CurrentMenu = 2");
-      if(isSelected == 1) {
+      }
+      break;
+    }
+    case button3: {
+      Serial.println("button1");
+      if(currentMenu == 1) {
+        Serial.println("Button = 3, CurrentMenu = 1");
+      } else if(currentMenu == 2) {
+        Serial.println("Button = 3, CurrentMenu = 2");
+        if(isSelected == 1) {
         lcd.clear();
         menuSetDate();
         currentMenu = 3;
@@ -426,11 +375,11 @@ void loop() {
 //        numberClick = 0;
         clearValueToMenu(1);
       }
-     } else if(currentMenu == 3) {
-      Serial.println("Button = 3, CurrentMenu = 3");
-     } else if(currentMenu == 4) {
-      Serial.println("Button = 3, CurrentMenu = 4");
-      if(isSelected == 1) {
+      } else if(currentMenu == 3) {
+        Serial.println("Button = 3, CurrentMenu = 3");
+      } else if(currentMenu == 4) {
+        Serial.println("Button = 3, CurrentMenu = 4");
+        if(isSelected == 1) {
 //        Serial.print("=========== 1 Time");
         currentMenu = 5;
         menuSetTimeX(1);
@@ -452,18 +401,21 @@ void loop() {
         clearValueToMenu(1);
         timerSelected = 3;
       }
-     } else if(currentMenu == 5) {
-      Serial.println("Button = 3, CurrentMenu = 5");
-//      Serial.println("Timer ==>");
-//      Serial.print(isTimer);
-      if(applySetTime == 1) {
+      } else if(currentMenu == 5) {
+        Serial.println("Button = 3, CurrentMenu = 5");
+        if(applySetTime == 1) {
         mainMenu();
         currentMenu = 2;
         isHM = 0;
         applySetTime = 0;
-        isAlarm = 1;
-//        Serial.println("Timer");
-        
+        Serial.println("TimerSelected");
+        Serial.print(timerSelected);
+        Serial.println("hour1 = ");
+        Serial.print(hours1);
+        Serial.print(" : ");
+        Serial.print(minutes1);
+//        isAlarm = 1;
+//        Serial.println("Timer");       
 //        timePerDay = 
       }
       if(isHM == 0) {
@@ -534,13 +486,13 @@ void loop() {
           }
         }
       }
-     } else if(currentMenu == 6) {
-      Serial.println("Button = 3, CurrentMenu = 6");
-     } else if(currentMenu == 7) {
-      Serial.println("Button = 3, CurrentMenu = 7");
-     } else if(currentMenu == 8) {
-      Serial.println("Button = 3, CurrentMenu = 8");
-      if(weightPerDay != 0) {
+      } else if(currentMenu == 6) {
+        Serial.println("Button = 3, CurrentMenu = 6");
+      } else if(currentMenu == 7) {
+        Serial.println("Button = 3, CurrentMenu = 7");
+      } else if(currentMenu == 8) {
+        Serial.println("Button = 3, CurrentMenu = 8");
+        if(weightPerDay != 0) {
 //        numberClick = 0;
         clearValueToMenu(1);
         mainMenu();
@@ -548,44 +500,29 @@ void loop() {
       } else {
 //        Serial.println("WeightPerDay == 0");
       }
-     }
-     break;
-     }
-   case button4:
-     {
-     if(currentMenu == 0) {
-      mainMenu();
-      currentMenu = 1;
+      }
+      break;
+    }
+    case button4: {
+      Serial.println("button1");
+      if(currentMenu == 1) {
+        Serial.println("Button = 4, CurrentMenu = 1");
+      } else if(currentMenu == 2) {
+        Serial.println("Button = 4, CurrentMenu = 2");
+        lcd.clear();
+        statusMenu();
+        currentMenu = 1;
+      } else if(currentMenu == 3) {
+        Serial.println("Button = 4, CurrentMenu = 3");
+         mainMenu();
+         currentMenu = 2;
 //      numberClick = 0;
       clearValueToMenu(1);
-      Serial.println("Button = 4, CurrentMenu = 0");
-     } else if(currentMenu == 1) {
-      Serial.println("Button = 4, CurrentMenu = 1");
-      lcd.clear();
-      statusMenu();
-      currentMenu = 1;
-//      numberClick = 0;
-      clearValueToMenu(1);
-     } else if(currentMenu == 2) {
-      Serial.println("Button = 4, CurrentMenu = 2");
-      lcd.clear();
-      statusMenu();
-      currentMenu = 1;
-     } else if(currentMenu == 3) {
-      Serial.println("Button = 4, CurrentMenu = 3");
-      mainMenu();
-      currentMenu = 2;
-//      numberClick = 0;
-      clearValueToMenu(1);
-     } else if(currentMenu == 4) {
-      Serial.println("Button = 4, CurrentMenu = 4");
-      mainMenu();
-      currentMenu = 2;
-//      numberClick = 0;
-      clearValueToMenu(1);
-     } else if(currentMenu == 5) {
-      Serial.println("Button = 4, CurrentMenu = 5");
-      applyTime();
+      } else if(currentMenu == 4) {
+        Serial.println("Button = 4, CurrentMenu = 4");
+      } else if(currentMenu == 5) {
+        Serial.println("Button = 4, CurrentMenu = 5");
+        applyTime();
       if(applySetTime == 0) {
         applySetTime = 1;
       } else {
@@ -605,68 +542,33 @@ void loop() {
 //        isHM = 0;
       }
       applySetTime = 1;
-     } else if(currentMenu == 6) {
-//      Serial.println("Button = 4, CurrentMenu = 6");
-     } else if(currentMenu == 7) {
-//      Serial.println("Button = 4, CurrentMenu = 7");
-     } else if(currentMenu == 8) {
-      Serial.println("Button = 4, CurrentMenu = 8");
-      lcd.clear();
-      mainMenu();
-      currentMenu = 2;
+      } else if(currentMenu == 6) {
+        Serial.println("Button = 4, CurrentMenu = 6");
+      } else if(currentMenu == 7) {
+        Serial.println("Button = 4, CurrentMenu = 7");
+      } else if(currentMenu == 8) {
+        Serial.println("Button = 4, CurrentMenu = 8");
+        lcd.clear();
+        mainMenu();
+        currentMenu = 2;
 //      numberClick = 0;
-      clearValueToMenu(1);
-     }
-     break;
-     }
-    case btnNone:
-     {
-     checkTimeToDo();
-     if(currentMenu == 1) {
+        clearValueToMenu(1);
+      }
+      break;
+    }
+    case btnNone: {
+      if(currentMenu == 1) {
       statusMenu();
-     } else if(currentMenu == 3) {
-      menuSetDate();
-     }
-     break;
-     }
- }
+      }
+      break;
+    }
+  }
+
 }
 void checkTimeToDo() {
-  DateTime now = rtc.now();
-  Serial.println("isFeeding =");
-//    Serial.print(isFeeding);
-  if(isFeeding != 0 ) {
-//    Serial.print("isTimerSelected");
-    if(hours1 == now.hour() && minutes1 == now.minute()) {
-      if(isFeeding == 0) {
-        Serial.println("Feeder Now");
-        isFeeding = 1;
-      } else if(isFeeding == 1) {
-        
-      }
-    } else {
-      isFeeding = 0;
-    }
-  } else {
-//    Serial.println("isFeeding != 0 && isAlarm == 1");
-//    Serial.println("isFeeding =");
-//    Serial.print(isFeeding);
-  }
-//  if(hours1 == now.hour() && minutes1 == now.minute()) {
-////    isFeeding = 1;
-//    if(isFeeding == 0) {
-//      Serial.println("Feeder Now!!");
-//      digitalWrite(ledPin, HIGH);
-//      isFeeding = 1;
-//    } else if(isFeeding == 1) {
-////      Serial.println("isFeeding = 1");
-//      digitalWrite(ledPin, LOW);
-//    }
-////    Serial.print("Feeder Now");
-//    digitalWrite(ledPin, LOW);
-//  } else {
-//    isFeeding = 0;
-//  }
+  DateTime now =rtc.now();
+  
+  
 }
 void statusMenu() {
   DateTime now = rtc.now();
@@ -677,23 +579,17 @@ void statusMenu() {
   lcd.print("/");
   lcd.print(now.year(), DEC);
   lcd.setCursor(12,0);
-//  if(now.hour() <= 9) {
-//    lcd.print("0");
-//  }
   numberOfTime(now.hour(), 1);
   lcd.print(now.hour(), DEC);
   lcd.print(":");
   numberOfTime(now.minute(), 1);
-//  if(now.minute() <= 9) {
-//    lcd.print("0");
-//  }
   lcd.print(now.minute(), DEC);
   lcd.print(":");
   lcd.print(now.second(), DEC);
   numberOfTime(now.second(), 2);
-//  if(now.second() <= 9) {
-//    lcd.print(" ");
-//  }
+  lcd.setCursor(0,3);
+  lcd.print("Menu");
+  //weight
   lcd.setCursor(0,3);
   lcd.print("Menu");
   if(weightPerDay != 0) {
@@ -715,19 +611,41 @@ void statusMenu() {
     }
   }
   if(timerSelected != 0) {
-    lcd.setCursor(0,2);
-    lcd.print(hours1);
-    lcd.print(":");
-    lcd.print(minutes1);
-    lcd.print("/");
-    lcd.print(hours2);
-    lcd.print(":");
-    lcd.print(minutes2);
-    lcd.print("/");
-    lcd.print(hours3);
-    lcd.print(":");
-    lcd.print(minutes3);
+    if(timerSelected == 1) {
+      statusTime1();
+    } else if(timerSelected == 2) {
+      statusTime1();
+      statusTime2();
+    } else if(timerSelected == 3) {
+      statusTime1();
+      statusTime2();
+      statusTime3();
+    }
   }
+}
+void statusTime1() {
+  lcd.setCursor(0,2);
+  numberOfTime(hours1, 1);
+  lcd.print(hours1);
+  lcd.print(":");
+  numberOfTime(minutes1, 1);
+  lcd.print(minutes1);
+}
+void statusTime2() {
+  lcd.print("/");
+  numberOfTime(hours2, 1);
+  lcd.print(hours2);
+  lcd.print(":");
+  numberOfTime(minutes2, 1);
+  lcd.print(minutes2);
+}
+void statusTime3() {
+  lcd.print("/");
+  numberOfTime(hours3, 1);
+  lcd.print(hours3);
+  lcd.print(":");
+  numberOfTime(minutes3, 1);
+  lcd.print(minutes3);
 }
 void mainMenu() {
   lcd.clear();
@@ -757,38 +675,14 @@ void menuSetDate() {
   lcd.print("/");
   lcd.print(nowYear);
   lcd.setCursor(0,2);
-//  lcd.print("   ");
   numberOfTime(nowHour, 1);
-//  if(nowHour <= 9) {
-//    lcd.print("0");
-//  }
   lcd.print(nowHour);
   lcd.print(":");
   numberOfTime(nowMinute, 1);
-//  if(nowMinute <= 9) {
-//    lcd.print("0");
-//  }
   lcd.print(nowMinute);
   lcd.print(":");
   lcd.print(nowSecond);
   numberOfTime(nowSecond, 2);
-//  if(nowSecond <= 9) {
-//    lcd.print(" ");
-//  }
-}
-void numberOfTime(int t, int o) {
-//  if(t <= 9) {
-//    lcd.print("0");
-//  }
-   if(o == 1) {
-    if(t <= 9) {
-      lcd.print("0");
-    }
-   } else if(o == 2) {
-    if(t <= 9) {
-      lcd.print(" ");
-    }
-   }
 }
 void setDateTime(int c) {
   if(c == 1) {
@@ -804,6 +698,17 @@ void setDateTime(int c) {
   } else if(c == 6) {
     
   }
+}
+void numberOfTime(int t, int o) {
+   if(o == 1) {
+    if(t <= 9) {
+      lcd.print("0");
+    }
+   } else if(o == 2) {
+    if(t <= 9) {
+      lcd.print(" ");
+    }
+   }
 }
 void menuTimePerDay() {
   lcd.clear();
@@ -824,20 +729,16 @@ void menuSetTimeX(int n) {
   lcd.print(n);
   if(n == 1) {
     menuSetTime1();
-
   } else if(n == 2) {
     menuSetTime1();
     menuSetTime2();
-
   } else if(n == 3) {
     menuSetTime1();
     menuSetTime2();
     menuSetTime3();
-    
   }
 }
 void menuSetTime1() {
-  isFeeding = 2;
   lcd.setCursor(1,1);
   lcd.print("Time=>1 = ");
   if(hours1 <= 9) {
@@ -859,7 +760,6 @@ void menuSetTime2() {
     lcd.print("0");
   }
   lcd.print(hours2);
-  isFeeding = 2;
   lcd.print(":");
   if(minutes2 <= 9) {
     lcd.print("0");
@@ -869,7 +769,6 @@ void menuSetTime2() {
   }
 }
 void menuSetTime3() {
-  isFeeding = 3;
   lcd.setCursor(1,3);
   lcd.print("Time=>3 = ");
   if(hours3 <= 9) {
@@ -935,16 +834,6 @@ void menuWeightPerDay() {
   lcd.setCursor(10,3);
   lcd.print("6. 300g");
 }
-void clearValueToMenu(int o) {
-//  numberClick = 0;
-  if(o == 1) {
-    numberClick = 0;
-  } else if(o == 2) {
-    numberClick = 0;
-    isHM = 0;
-  }
-
-}
 void selectItem(int r, int c) {
   lcd.setCursor(r,c);
   lcd.print("<");
@@ -953,3 +842,38 @@ void unSelectItem(int r, int c) {
   lcd.setCursor(r,c);
   lcd.print(" ");
 }
+void clearValueToMenu(int o) {
+//  numberClick = 0;
+  if(o == 1) {
+    numberClick = 0;
+  } else if(o == 2) {
+    numberClick = 0;
+    isHM = 0;
+  }
+}
+int read_LCD_Button() {
+  buttonState1 = digitalRead(buttonPin1);
+  buttonState2 = digitalRead(buttonPin2);
+  buttonState3 = digitalRead(buttonPin3);
+  buttonState4 = digitalRead(buttonPin4);
+  if(buttonState1 == LOW && prevButtonState1 == HIGH) {
+    prevButtonState1 = buttonState1;
+    return button1;
+  } else if(buttonState2 == LOW && prevButtonState2 == HIGH) {
+    prevButtonState2 = buttonState2;
+    return button2;
+  } else if(buttonState3 == LOW && prevButtonState3 == HIGH) {
+    prevButtonState3 = buttonState3;
+    return button3;
+  } else if(buttonState4 == LOW && prevButtonState4 == HIGH) {
+    prevButtonState4 = buttonState4;
+    return button4;
+  } else {
+    prevButtonState1 = buttonState1;
+    prevButtonState2 = buttonState2;
+    prevButtonState3 = buttonState3;
+    prevButtonState4 = buttonState4;
+    return btnNone;
+  }
+}
+
