@@ -42,10 +42,13 @@ int isFeeding3 = 0;
 //time value
 int hours1 = 0;
 int minutes1 = 0;
+int seconds1 = 0;
 int hours2 = 0;
 int minutes2 = 0;
+int seconds2 = 0;
 int hours3 = 0;
 int minutes3 = 0;
+int seconds3 = 0;
 //time now
 int nowDay = 0;
 int nowMonth = 0;
@@ -645,7 +648,7 @@ void loop() {
 //check time 24hr to reset isFeeding1 isFeeding2 isFeeding3 to 0
 void check24hr() {
   DateTime now = rtc.now();
-  if(now.hour() == 00 && now.minute() == 00 && now.second() == 0) {
+  if(now.hour() == 00 && now.minute() == 00 && now.second() == 00) {
     Serial.println("00:00:00");
     isFeeding1 = 0;
     isFeeding2 = 0;
@@ -657,7 +660,8 @@ void checkTimeToFeed() {
   DateTime now = rtc.now();
   nowHour = now.hour();
   nowMinute = now.minute();
-  if(hours1 == nowHour && minutes1 == nowMinute) {
+  nowSecond = now.second();
+  if(hours1 == nowHour && minutes1 == nowMinute && seconds1 == nowSecond) {
 //    Serial.println("Feeding Time 1");
 //    delay(2000);
     if(isFeeding1 == 0) {
