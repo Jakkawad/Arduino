@@ -10,10 +10,10 @@ RTC_DS3231 rtc;
 #define button4  4
 #define buttonNone 0
 //button 
-const int buttonPin1 = 2;
-const int buttonPin2 = 3;
-const int buttonPin3 = 4;
-const int buttonPin4 = 5;
+const int buttonPin1 = 4;
+const int buttonPin2 = 5;
+const int buttonPin3 = 6;
+const int buttonPin4 = 7;
 int buttonState1 = 0;
 int buttonState2 = 0;
 int buttonState3 = 0;
@@ -36,7 +36,9 @@ int weightPerDay = 0;
 int timePerDay = 0;
 int timerSelected = 0;
 //feeding
-int isFeeding = 0;
+int isFeeding1 = 0;
+int isFeeding2 = 0;
+int isFeeding3 = 0;
 //time value
 int hours1 = 0;
 int minutes1 = 0;
@@ -476,18 +478,13 @@ void loop() {
           isHM = 0;
           applySetTime = 0;
           isSetTime = 1;
-//          Serial.println("TimerSelected");
-//          Serial.print(timerSelected);
-//          Serial.println("hour1 = ");
-//          Serial.print(hours1);
+//          Serial.println(hours1);
 //          Serial.print(" : ");
 //          Serial.print(minutes1);
-//          Serial.println("hour2 = ");
-//          Serial.print(hours2);
+//          Serial.println(hours2);
 //          Serial.print(" : ");
 //          Serial.print(minutes2);
-//          Serial.println("hour3 = ");
-//          Serial.print(hours3);
+//          Serial.println(hours3);
 //          Serial.print(" : ");
 //          Serial.print(minutes3);
         } else {
@@ -609,7 +606,6 @@ void loop() {
         menuTimePerDay();
         currentMenu = 4;
         numberClick = 0;
-//        clearValueToMenu(2);
         applySetTime = 0;
         timerSelected = 0;
         isSetTime = 0;
@@ -635,6 +631,7 @@ void loop() {
     }
     case buttonNone: {
 //      Serial.println("ButtonNone");
+      check24hr();
       if(currentMenu ==  1) {
         statusMenu();
       }
@@ -645,6 +642,17 @@ void loop() {
     }
   }
 }
+//check time 24hr to reset isFeeding1 isFeeding2 isFeeding3 to 0
+void check24hr() {
+  DateTime now = rtc.now();
+  if(now.hour() == 00 && now.minute() == 00 && now.second() == 0) {
+    Serial.println("00:00:00");
+    isFeeding1 = 0;
+    isFeeding2 = 0;
+    isFeeding3 = 0;
+  }
+}
+//check time to feed
 void checkTimeToFeed() {
   DateTime now = rtc.now();
   nowHour = now.hour();
@@ -652,31 +660,39 @@ void checkTimeToFeed() {
   if(hours1 == nowHour && minutes1 == nowMinute) {
 //    Serial.println("Feeding Time 1");
 //    delay(2000);
-    if(isFeeding == 0) {
-      Serial.println("isFeeding");
-      isFeeding = 1;
+    if(isFeeding1 == 0) {
+      Serial.println("isFeeding1");
+      isFeeding1 = 1;
       digitalWrite(8, HIGH);
       delay(2000);
     } else {
 //      Serial.println("else");
-//      isFeeding = 0;
+//      isFeeding1 = 0;
       digitalWrite(8, LOW); 
     }
   } else if(hours2 == nowHour && minutes2 == nowMinute) {
-    Serial.println("Feeding Time 2");
-    if(isFeeding == 0) {
-      Serial.println("isFeeding 2");
-      isFeeding = 1;
+//    Serial.println("Feeding Time 2");
+    if(isFeeding2 == 0) {
+      Serial.println("isFeeding2");
+      isFeeding2 = 1;
       digitalWrite(8, HIGH);
       delay(2000);
     } else {
       digitalWrite(8, LOW);
     }
   } else if(hours3 == nowHour && minutes3 == nowMinute) {
-//    Serial.println("Feeding Time 3");
+    Serial.println("Feeding Time 3");
+    if(isFeeding3 == 0) {
+      Serial.println("isFeeding3");
+      isFeeding3 = 1;
+      digitalWrite(8, HIGH);
+      delay(2000);
+    } else {
+      digitalWrite(8, LOW);
+    }
   }
 }
-//menu lcd
+
 void statusMenu() {
   DateTime now = rtc.now();
   lcd.setCursor(0,0);
@@ -692,15 +708,29 @@ void statusMenu() {
   numberOfTime(now.minute(), 1);
   lcd.print(now.minute(), DEC);
   lcd.print(":");
-  lcd.print(now.second(), DEC);
   numberOfTime(now.second(), 1);
+  lcd.print(now.second(), DEC);
+  //
   lcd.setCursor(0,3);
   lcd.print("Menu");
   //weight
   if(weightPerDay != 0) {
     lcd.setCursor(7, 3);
     lcd.print("Weight = ");
-    lcd.print(weightPerDay);
+    if(weightPerDay == 1) {
+      lcd.print("50g");
+    } else if(weightPerDay == 2) {
+      lcd.print("100g");
+    } else if(weightPerDay == 3) {
+      lcd.print("150g");
+    } else if(weightPerDay == 4) {
+      lcd.print("200g");
+    } else if(weightPerDay == 5) {
+      lcd.print("250g");
+    } else if(weightPerDay == 6) {
+      lcd.print("300g");
+    }
+//    lcd.print(weightPerDay);
   }
   //timeperday
   if(timePerDay != 0) {
@@ -804,11 +834,6 @@ void menuSetDate() {
   lcd.print(nowMinute);
   lcd.print(":");
   lcd.print(nowSecond);
-//  if(nowSecond <= 9) {
-//    numberOfTime(nowSecond,2);
-//  } else {
-//    numberOfTime(nowSecond,1);
-//  }
   numberOfTime(nowSecond, 2);
 }
 void menuSetTimeX(int n) {

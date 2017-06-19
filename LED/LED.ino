@@ -1,4 +1,4 @@
-int redLed = 53;
+int redLed = 8;
 
 void setup() {
   // put your setup code here, to run once:
@@ -9,8 +9,8 @@ void loop() {
   // put your main code here, to run repeatedly:
   digitalWrite(redLed, HIGH);
 //  analogWrite(redLed, HIGH);
-  delay(100);
+  delay(1000);
   digitalWrite(redLed, LOW);
 //  analogWrite(redLed, LOW);
-  delay(100);
+  delay(1000);
 }
