@@ -465,7 +465,7 @@ void loop() {
 //            Serial.println("ApplySetTime = 0");
             //SetDate-1
             if(isHM == 1) {
-              
+              setYear -= 1;
             } else if(isHM == 2) {
               if(setMonth <= 0) {
                 setMonth = 12;
@@ -700,19 +700,19 @@ void checkTimeToFeed() {
   nowHour = now.hour();
   nowMinute = now.minute();
   nowSecond = now.second();
-  if (weightPerDay == 1) {
-      weightInGrams = 50;
-    } else if (weightPerDay == 2) {
-      weightInGrams = 100;
-    } else if (weightPerDay == 3) {
-      weightInGrams = 150;
-    } else if (weightPerDay == 4) {
-      weightInGrams = 200;
-    } else if (weightPerDay == 5) {
-      weightInGrams = 250;
-    } else if (weightPerDay == 6) {
-      weightInGrams = 300;
-    }
+//  if (weightPerDay == 1) {
+//      weightInGrams = 50;
+//    } else if (weightPerDay == 2) {
+//      weightInGrams = 100;
+//    } else if (weightPerDay == 3) {
+//      weightInGrams = 150;
+//    } else if (weightPerDay == 4) {
+//      weightInGrams = 200;
+//    } else if (weightPerDay == 5) {
+//      weightInGrams = 250;
+//    } else if (weightPerDay == 6) {
+//      weightInGrams = 300;
+//    }
   if (hours1 == nowHour && minutes1 == nowMinute) {
   //    Serial.println("Feeding Time 1");
     if (feedingStatus1 == 0) {
@@ -795,16 +795,22 @@ void statusMenu() {
     lcd.print("Weight = ");
     if (weightPerDay == 1) {
       lcd.print("50g");
+      weightInGrams = 50;
     } else if (weightPerDay == 2) {
       lcd.print("100g");
+      weightInGrams = 100;
     } else if (weightPerDay == 3) {
       lcd.print("150g");
+      weightInGrams = 150;
     } else if (weightPerDay == 4) {
       lcd.print("200g");
+      weightInGrams = 200;
     } else if (weightPerDay == 5) {
       lcd.print("250g");
+      weightInGrams = 250;
     } else if (weightPerDay == 6) {
       lcd.print("300g");
+      weightInGrams = 300;
     }
   }
   //timeperday
