@@ -674,12 +674,23 @@ void loop() {
       }
   }
 }
+boolean isLeapYear(int year) {
+ if(setYear % 400 == 0) {
+   return(true);
+ } else if(setYear % 100 == 0) {
+   return(false);
+ } else if(setYear % 4 == 0) {
+   return(true);
+ } else {
+   return(false);
+ }
+}
 //check day in month 30/31/28/29
 void checkDayInMonth() {
  if(setMonth == 1 && setMonth == 3 && setMonth == 5 && setMonth == 7 && setMonth == 8 && setMonth == 10 && setMonth == 12) {
    //31day
-} else {
-   //30day
+} else if(setMonth == 2 && isLeapYear(setYear)) {
+   //29day
 }
 //check time 24hr to reset isFeeding1 isFeeding2 isFeeding3 to 0
 void check24hr() {
