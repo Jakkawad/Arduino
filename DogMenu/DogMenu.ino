@@ -1,12 +1,9 @@
 #include <LiquidCrystal_I2C.h>
 #include <Wire.h>
 #include "RTClib.h"
-//SD
-
-//SD
 LiquidCrystal_I2C lcd(0x27, 20, 4);
 RTC_DS3231 rtc;
-//
+//relayDC
 int relayDC = 8;
 //define
 #define button1  1
@@ -89,7 +86,6 @@ void setup() {
     Serial.println("RTC lost power, lets set the time!");
 //    rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
   }
-  //SD
   
   //delay
   pinMode(relayDC, OUTPUT);
@@ -113,21 +109,27 @@ void loop() {
         } else if (currentMenu == 3) {
           Serial.println("Button 1 Menu 3");
           if (numberClick == 0) {
+            isHM = 1;
             numberClick += 1;
             setDayMonthYear(1);
           } else if (numberClick == 1) {
+            isHM = 2;
             numberClick += 1;
             setDayMonthYear(2);
           } else if (numberClick == 2) {
+            isHM = 3;
             numberClick += 1;
             setDayMonthYear(3);
           } else if (numberClick == 3) {
+            isHM = 4;
             numberClick += 1;
             setDayMonthYear(4);
           } else if (numberClick == 4) {
+            isHM = 5;
             numberClick += 1;
             setDayMonthYear(5);
           } else if (numberClick == 5) {
+            isHM = 6;
             numberClick += 1;
             setDayMonthYear(6);
           } else {
@@ -260,6 +262,38 @@ void loop() {
         } else if (currentMenu == 3) {
           Serial.println("Button 2 Menu 3");
           //SetDate+1
+          //setTime [setDay, setMonth, setYear, setHour, setMinute, setSecond]
+          if(isHM == 1) {
+            setYear += 1;
+          } else if(isHM == 2) {
+            if(setMonth >= 12) {
+             setMonth = 1; 
+            } else {
+              setMonth += 1;
+          } else if(isHM == 3) {
+            if(setDay >= 30) {
+              setDay = 1;
+            } else {
+              setDay += 1;
+            }
+          } else if(isHM == 4) {
+            if(setHour >= 23) {
+              setHour = 0;
+            } else {
+              setHour += 1;
+            }
+          } else if(isHM == 5) {
+            if(setMinute >= 59) {
+              setMinute = 0;
+            } else {
+              setMinute += 1;
+          }  else if(isHM == 6) {
+             if(setSecond >= 59) {
+               setSecond = 0;
+             } else {
+               setSecond += 1;
+             }
+          }
 
         } else if (currentMenu == 4) {
           Serial.println("Button 2 Menu 4");
@@ -425,10 +459,42 @@ void loop() {
             isHM = 0;
             applySetTime = 0;
             //setTime [setDay, setMonth, setYear, setHour, setMinute, setSecond]
-            rtc.adjust(DateTime(2014, 1, 21, 3, 0, 0));
+            //rtc.adjust(DateTime(2014, 1, 21, 3, 0, 0));
+            rtc.adjuct(DateTime(setYear, setMonth, setDay, setHour, setMinute, setSecond));
           } else {
 //            Serial.println("ApplySetTime = 0");
             //SetDate-1
+            if(isHM == 1) {
+              
+            } else if(isHM == 2) {
+              if(setMonth <= 0) {
+                setMonth = 12;
+              } else {
+                setMonth -= 1;
+            } else if(isHM == 3) {
+              if(setDay <= 0) {
+                setDay = 31;
+              } else {
+                setDay -= 1;
+            } else if(isHM == 4) {
+              if(setHour <= 0) {
+                setHour = 23;
+              } else {
+                setHour -= 1;
+              }
+            } else if(isHM == 5) {
+              if(setMinute <= 0) {
+                setMinute = 59;
+              } else {
+                setMinute -= 1;
+              }
+            } else if(isHM == 6) {
+              if(setSecond <= 0) {
+                setSecond = 59;
+              } else {
+                setSecond -= 1;
+              }
+            }
           }
         } else if (currentMenu == 4) {
           Serial.println("Button 3 Menu 4");
@@ -607,6 +673,13 @@ void loop() {
         break;
       }
   }
+}
+//check day in month 30/31/28/29
+void checkDayInMonth() {
+ if(setMonth == 1 && setMonth == 3 && setMonth == 5 && setMonth == 7 && setMonth == 8 && setMonth == 10 && setMonth == 12) {
+   //31day
+} else {
+   //30day
 }
 //check time 24hr to reset isFeeding1 isFeeding2 isFeeding3 to 0
 void check24hr() {
