@@ -267,9 +267,10 @@ void loop() {
             setYear += 1;
           } else if(isHM == 2) {
             if(setMonth >= 12) {
-             setMonth = 1; 
+              setMonth = 1;
             } else {
               setMonth += 1;
+            }
           } else if(isHM == 3) {
             if(setDay >= 30) {
               setDay = 1;
@@ -277,7 +278,7 @@ void loop() {
               setDay += 1;
             }
           } else if(isHM == 4) {
-            if(setHour >= 23) {
+            if(setHour >= 59) {
               setHour = 0;
             } else {
               setHour += 1;
@@ -287,14 +288,14 @@ void loop() {
               setMinute = 0;
             } else {
               setMinute += 1;
-          }  else if(isHM == 6) {
-             if(setSecond >= 59) {
-               setSecond = 0;
-             } else {
-               setSecond += 1;
-             }
+            }
+          } else if(isHM == 6) {
+            if(setSecond >= 59) {
+              setSecond = 0;
+            } else {
+              setSecond += 1;
+            }
           }
-
         } else if (currentMenu == 4) {
           Serial.println("Button 2 Menu 4");
           if (numberClick == 0) {
@@ -460,22 +461,26 @@ void loop() {
             applySetTime = 0;
             //setTime [setDay, setMonth, setYear, setHour, setMinute, setSecond]
             //rtc.adjust(DateTime(2014, 1, 21, 3, 0, 0));
-            rtc.adjuct(DateTime(setYear, setMonth, setDay, setHour, setMinute, setSecond));
+            Serial.println("SetDay = ");
+            Serial.print(setDay);
+            rtc.adjust(DateTime(setYear, setMonth, setDay, setHour, setMinute, setSecond));
           } else {
 //            Serial.println("ApplySetTime = 0");
             //SetDate-1
             if(isHM == 1) {
               setYear -= 1;
             } else if(isHM == 2) {
-              if(setMonth <= 0) {
+              if(setMonth <=  0) {
                 setMonth = 12;
               } else {
                 setMonth -= 1;
+              }
             } else if(isHM == 3) {
               if(setDay <= 0) {
                 setDay = 31;
               } else {
                 setDay -= 1;
+              }
             } else if(isHM == 4) {
               if(setHour <= 0) {
                 setHour = 23;
@@ -483,8 +488,8 @@ void loop() {
                 setHour -= 1;
               }
             } else if(isHM == 5) {
-              if(setMinute <= 0) {
-                setMinute = 59;
+              if(setMinute <= 0 ) {
+                setHour = 59;
               } else {
                 setMinute -= 1;
               }
@@ -674,24 +679,25 @@ void loop() {
       }
   }
 }
-boolean isLeapYear(int year) {
- if(setYear % 400 == 0) {
-   return(true);
- } else if(setYear % 100 == 0) {
-   return(false);
- } else if(setYear % 4 == 0) {
-   return(true);
- } else {
-   return(false);
- }
-}
+//boolean isLeapYear(int year) {
+// if(setYear % 400 == 0) {
+//   return(true);
+// } else if(setYear % 100 == 0) {
+//   return(false);
+// } else if(setYear % 4 == 0) {
+//   return(true);
+// } else {
+//   return(false);
+// }
+//}
 //check day in month 30/31/28/29
-void checkDayInMonth() {
- if(setMonth == 1 && setMonth == 3 && setMonth == 5 && setMonth == 7 && setMonth == 8 && setMonth == 10 && setMonth == 12) {
-   //31day
-} else if(setMonth == 2 && isLeapYear(setYear)) {
-   //29day
-}
+//void checkDayInMonth() {
+// if(setMonth == 1 && setMonth == 3 && setMonth == 5 && setMonth == 7 && setMonth == 8 && setMonth == 10 && setMonth == 12) {
+//   //31day
+//} else if(setMonth == 2 && isLeapYear(setYear)) {
+//   //29day
+//}
+//}
 //check time 24hr to reset isFeeding1 isFeeding2 isFeeding3 to 0
 void check24hr() {
   DateTime now = rtc.now();
@@ -905,6 +911,7 @@ void menuTimePerDay() {
 void menuSetDate() {
   lcd.setCursor(0, 0);
   lcd.print("Set Date");
+  // Fix 
   DateTime now = rtc.now();
   nowDay = now.day();
   nowMonth = now.month();
@@ -912,6 +919,7 @@ void menuSetDate() {
   nowHour = now.hour();
   nowMinute = now.minute();
   nowSecond = now.second();
+  // Fix 
   lcd.setCursor(0, 1);
   lcd.print(nowDay);
   lcd.print("/");
