@@ -59,9 +59,9 @@ int hours3 = 0;
 int minutes3 = 0;
 int seconds3 = 0;
 //time now
-int nowDay = 0;
-int nowMonth = 0;
-int nowYear = 0;
+//int nowDay = 0;
+//int nowMonth = 0;
+//int nowYear = 0;
 int nowHour = 0;
 int nowMinute = 0;
 int nowSecond = 0;
@@ -239,6 +239,13 @@ void loop() {
         Serial.println("Button 2");
         if (currentMenu == 1) {
           Serial.println("Button 2 Menu 1");
+          Serial.println("Dummy Status To Work");
+          DateTime now = rtc.now();
+          hours1 = now.hour();
+//          minutes1 = now.minute();
+          isSetTime = 1;
+          timePerDay = 1;
+          weightPerDay = 3;
         } else if (currentMenu == 2) {
           Serial.println("Button 2 Menu 2");
           if (numberClick == 0) {
@@ -262,38 +269,49 @@ void loop() {
         } else if (currentMenu == 3) {
           Serial.println("Button 2 Menu 3");
           //SetDate+1
+//          menuSetDate()
           //setTime [setDay, setMonth, setYear, setHour, setMinute, setSecond]
           if(isHM == 1) {
             setYear += 1;
           } else if(isHM == 2) {
             if(setMonth >= 12) {
               setMonth = 1;
+              menuSetDate();
             } else {
               setMonth += 1;
+              menuSetDate();
             }
           } else if(isHM == 3) {
             if(setDay >= 30) {
               setDay = 1;
+              menuSetDate();
             } else {
               setDay += 1;
+              menuSetDate();
             }
           } else if(isHM == 4) {
             if(setHour >= 59) {
               setHour = 0;
+              menuSetDate();
             } else {
               setHour += 1;
+              menuSetDate();
             }
           } else if(isHM == 5) {
             if(setMinute >= 59) {
               setMinute = 0;
+              menuSetDate();
             } else {
               setMinute += 1;
+              menuSetDate();
             }
           } else if(isHM == 6) {
             if(setSecond >= 59) {
               setSecond = 0;
+              menuSetDate();
             } else {
               setSecond += 1;
+              menuSetDate();
             }
           }
         } else if (currentMenu == 4) {
@@ -461,8 +479,20 @@ void loop() {
             applySetTime = 0;
             //setTime [setDay, setMonth, setYear, setHour, setMinute, setSecond]
             //rtc.adjust(DateTime(2014, 1, 21, 3, 0, 0));
-            Serial.println("SetDay = ");
+//            Serial.println("SetDay = ");
+//            Serial.print(setDay);
+            Serial.println("rtc.adjust = ");
+            Serial.print(setYear);
+            Serial.print("/");
+            Serial.print(setMonth);
+            Serial.print("/");
             Serial.print(setDay);
+            Serial.print("/ ");
+            Serial.print(setHour);
+            Serial.print(":");
+            Serial.print(setMinute);
+            Serial.print(":");
+            Serial.print(setSecond);
             rtc.adjust(DateTime(setYear, setMonth, setDay, setHour, setMinute, setSecond));
           } else {
 //            Serial.println("ApplySetTime = 0");
@@ -472,32 +502,42 @@ void loop() {
             } else if(isHM == 2) {
               if(setMonth <=  0) {
                 setMonth = 12;
+                menuSetDate();
               } else {
                 setMonth -= 1;
+                menuSetDate();
               }
             } else if(isHM == 3) {
               if(setDay <= 0) {
                 setDay = 31;
+                menuSetDate();
               } else {
                 setDay -= 1;
+                menuSetDate();
               }
             } else if(isHM == 4) {
               if(setHour <= 0) {
                 setHour = 23;
+                menuSetDate();
               } else {
                 setHour -= 1;
+                menuSetDate();
               }
             } else if(isHM == 5) {
               if(setMinute <= 0 ) {
                 setHour = 59;
+                menuSetDate();
               } else {
                 setMinute -= 1;
+                menuSetDate();
               }
             } else if(isHM == 6) {
               if(setSecond <= 0) {
                 setSecond = 59;
+                menuSetDate();
               } else {
                 setSecond -= 1;
+                menuSetDate();
               }
             }
           }
@@ -528,11 +568,9 @@ void loop() {
             applySetTime = 0;
             isSetTime = 1;
           } else {
-//            Serial.println("ApplySetTime = 0");
           }
           if (isHM != 0) {
             if (isTimer == 1) {
-//              Serial.println("isTimer == 2");
               if (isHM == 1) {
                 menuSetTime1();
                 if (hours1 <= 0) {
@@ -553,7 +591,6 @@ void loop() {
                 }
               }
             } else if (isTimer == 2) {
-//              Serial.println("isTimer == 2");
               if (isHM == 1) {
                 menuSetTime2();
                 if (hours2 <= 0) {
@@ -574,7 +611,6 @@ void loop() {
                 }
               }
             } else if (isTimer == 3) {
-//              Serial.println("isTimer == 3");
               if (isHM == 1) {
                 menuSetTime3();
                 if (hours3 <= 0) {
@@ -736,16 +772,27 @@ void checkTimeToFeed() {
       Serial.println("feedingStatus = 0");
       if (isFeeding1 == 0) {
         Serial.println("isFeeding1");
-        while(loadCellWeight <= weightInGrams) {
+        if(loadCellWeight != weightInGrams) {
+          //Relay ON
           digitalWrite(relayDC, HIGH);
-          delay(1000);
+        } else {
+          //Relay OFF
           digitalWrite(relayDC, LOW);
-          delay(1000);
-          loadCellWeight += 50;
+          isFeeding1 = 1;
+          feedingStatus1 = 1;
         }
+//        while(loadCellWeight <= weightInGrams) {
+//          digitalWrite(relayDC, HIGH);
+//          delay(1000);
+//          digitalWrite(relayDC, LOW);
+//          delay(1000);
+//          loadCellWeight += 50;
+//        }
 //        digitalWrite(delayDC, LOW);
-        isFeeding1 = 1;
-        feedingStatus1 = 1;
+        //Status to feed
+//        isFeeding1 = 1;
+//        feedingStatus1 = 1;
+        //Status to feed
 ////        if (loadCellWeight != weightInGrams) {
 //          // working
 //          digitalWrite(relayDC, HIGH);
@@ -759,30 +806,30 @@ void checkTimeToFeed() {
 //          feedingStatus1 = 1;
 //        }
       } else {
-//        // relay off
+//        // Relay off
         digitalWrite(relayDC, LOW);
       }
     }
   } else if (hours2 == nowHour && minutes2 == nowMinute) {
     //    Serial.println("Feeding Time 2");
-    if (isFeeding2 == 0) {
-      Serial.println("isFeeding2");
-      isFeeding2 = 1;
-      digitalWrite(8, HIGH);
-      delay(2000);
-    } else {
-      digitalWrite(8, LOW);
-    }
+//    if (isFeeding2 == 0) {
+//      Serial.println("isFeeding2");
+//      isFeeding2 = 1;
+//      digitalWrite(8, HIGH);
+//      delay(2000);
+//    } else {
+//      digitalWrite(8, LOW);
+//    }
   } else if (hours3 == nowHour && minutes3 == nowMinute) {
-    Serial.println("Feeding Time 3");
-    if (isFeeding3 == 0) {
-      Serial.println("isFeeding3");
-      isFeeding3 = 1;
-      digitalWrite(8, HIGH);
-      delay(2000);
-    } else {
-      digitalWrite(8, LOW);
-    }
+//    Serial.println("Feeding Time 3");
+//    if (isFeeding3 == 0) {
+//      Serial.println("isFeeding3");
+//      isFeeding3 = 1;
+//      digitalWrite(8, HIGH);
+//      delay(2000);
+//    } else {
+//      digitalWrite(8, LOW);
+//    }
   }
 }
 
@@ -912,28 +959,28 @@ void menuSetDate() {
   lcd.setCursor(0, 0);
   lcd.print("Set Date");
   // Fix 
-  DateTime now = rtc.now();
-  nowDay = now.day();
-  nowMonth = now.month();
-  nowYear = now.year();
-  nowHour = now.hour();
-  nowMinute = now.minute();
-  nowSecond = now.second();
+//  DateTime now = rtc.now();
+//  nowDay = now.day();
+//  nowMonth = now.month();
+//  nowYear = now.year();
+//  nowHour = now.hour();
+//  nowMinute = now.minute();
+//  nowSecond = now.second();
   // Fix 
   lcd.setCursor(0, 1);
-  lcd.print(nowDay);
+  lcd.print(setDay);
   lcd.print("/");
-  lcd.print(nowMonth);
+  lcd.print(setMonth);
   lcd.print("/");
-  lcd.print(nowYear);
+  lcd.print(setYear);
   lcd.setCursor(10, 1);
-  numberOfTime(nowHour, 1);
-  lcd.print(nowHour);
+  numberOfTime(setHour, 1);
+  lcd.print(setHour);
   lcd.print(":");
-  numberOfTime(nowMinute, 1);
-  lcd.print(nowMinute);
+  numberOfTime(setMinute, 1);
+  lcd.print(setMinute);
   lcd.print(":");
-  lcd.print(nowSecond);
+  lcd.print(setSecond);
 //  numberOfTime(nowSecond, 2);
 }
 void menuSetTimeX(int n) {
