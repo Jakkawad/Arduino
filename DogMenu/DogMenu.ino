@@ -16,6 +16,9 @@ float get_units_kg();
 HX711 scale(DOUT, CLK);
 //Servo
 Servo myservo;
+int servo1Degree = 30;
+//int servo2Degree = 50;
+
 //relayDC
 int relayDC = 8;
 //define
@@ -743,8 +746,8 @@ void checkTimeToFeed() {
           digitalWrite(relayDC, LOW);
           isFeeding1 = 1;
           feedingStatus1 = 1;
-          // Servo
-          myservo.write(50);
+          // Servo position
+          myservo.write(servo1Degree);
           delay(3000);
           myservo.write(0);
         }
