@@ -3,17 +3,21 @@
 #include "RTClib.h"
 #include <Servo.h>
 #include "HX711.h"
-LiquidCrystal_I2C lcd(0x27, 20, 4);
+//LCD2004
+LiquidCrystal_I2C lcd(0x3F, 20, 4);
+//DS3231
 RTC_DS3231 rtc;
+
 //LoadCell
 float calibration_factor = 434709.00; 
 #define zero_factor 385700
 #define DOUT  A1
 #define CLK   A0
 #define DEC_POINT  3
-float offset=0;
+float offset = 0;
 float get_units_kg();
 HX711 scale(DOUT, CLK);
+
 //Servo
 Servo myservo;
 int servo1Degree = 30;
@@ -21,6 +25,7 @@ int servo1Degree = 30;
 
 //relayDC
 int relayDC = 8;
+
 //define
 #define button1  1
 #define button2  2
@@ -101,12 +106,15 @@ void setup() {
   if (rtc.lostPower()) {
     Serial.println("RTC lost power, lets set the time!");
 //    rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+    // เอาไว้ตั้งเวลาใหม่ตอนอัพโหลดใส่ arduino
   }
   
   //delay
   pinMode(relayDC, OUTPUT);
+  
   //servo
   myservo.attach(10);
+  
   //loadcell
   scale.set_scale(calibration_factor); 
   scale.set_offset(zero_factor);   
@@ -117,6 +125,7 @@ void loop() {
   buttonKey = read_LCD_Button();
   switch (buttonKey) {
     case button1: {
+      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         Serial.println("Button 1");
         if (currentMenu == 1) {
           Serial.println("Button 1 Menu 1");
@@ -244,6 +253,7 @@ void loop() {
         break;
       }
     case button2: {
+      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         Serial.println("Button 2");
         if (currentMenu == 1) {
           Serial.println("Button 2 Menu 1");
@@ -256,18 +266,6 @@ void loop() {
           Serial.print(hours1);
           Serial.print(":");
           Serial.print(minutes1);
-//          hours2 = now.hour();
-//          minutes2 += 2;
-//          Serial.print("Time2");
-//          Serial.print(hours2);
-//          Serial.print(":");
-//          Serial.print(minutes2);
-//          hours3 = now.hour();
-//          minutes3 += 3;
-//          Serial.print("Time3");
-//          Serial.print(hours3);
-//          Serial.print(":");
-//          Serial.print(minutes3);
           timePerDay = 1;
           weightPerDay = 1;
           isSetTime = 1;
@@ -457,6 +455,7 @@ void loop() {
         break;
       }
     case button3: {
+      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         Serial.println("Button 3");
         if (currentMenu == 1) {
           Serial.println("Button 3 Menu 1");
@@ -637,6 +636,7 @@ void loop() {
         break;
       }
     case button4: {
+      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         Serial.println("Button 4");
         if (currentMenu == 1) {
           Serial.println("Button 4 Menu 1");
@@ -728,6 +728,7 @@ void check24hr() {
 void checkTimeToFeed() {
   DateTime now = rtc.now();
   if (hours1 == now.hour() && minutes1 == now.minute()) {
+    // 1 minute to drop food
 //      Serial.println("Feeding Time 1");
     if (feedingStatus1 == 0) {
 //      Serial.println("feedingStatus = 0");
